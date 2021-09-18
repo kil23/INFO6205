@@ -4,6 +4,8 @@
 
 package edu.neu.coe.info6205.randomwalk;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 public class RandomWalk {
@@ -20,7 +22,8 @@ public class RandomWalk {
      * @param dy the distance he moves in the y direction
      */
     private void move(int dx, int dy) {
-        // TO BE IMPLEMENTED
+        x += dx;
+        y += dy;
     }
 
     /**
@@ -29,7 +32,9 @@ public class RandomWalk {
      * @param m the number of steps the drunkard takes
      */
     private void randomWalk(int m) {
-        // TO BE IMPLEMENTED
+        for(int i=1; i<=m; i++) {
+            randomMove();
+        }
     }
 
     /**
@@ -48,8 +53,7 @@ public class RandomWalk {
      * @return the (Euclidean) distance from the origin to the current position.
      */
     public double distance() {
-        // TO BE IMPLEMENTED
-        return 0;
+        return Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
     }
 
     /**
@@ -59,7 +63,7 @@ public class RandomWalk {
      * @param n the number of experiments to run
      * @return the mean distance
      */
-    public static double randomWalkMulti(int m, int n) {
+        public static double randomWalkMulti(int m, int n) {
         double totalDistance = 0;
         for (int i = 0; i < n; i++) {
             RandomWalk walk = new RandomWalk();
@@ -70,13 +74,20 @@ public class RandomWalk {
     }
 
     public static void main(String[] args) {
-        if (args.length == 0)
-            throw new RuntimeException("Syntax: RandomWalk steps [experiments]");
-        int m = Integer.parseInt(args[0]);
-        int n = 30;
-        if (args.length > 1) n = Integer.parseInt(args[1]);
-        double meanDistance = randomWalkMulti(m, n);
-        System.out.println(m + " steps: " + meanDistance + " over " + n + " experiments");
+        try (FileWriter fileWriter = new FileWriter("random_walk_info.csv")){
+            fileWriter.write("Steps,Distance\n");
+            int[] stepCounter = {2,3,6,10,15,21,28,36,45,55,66,78,91,105,120};
+            for (int k : stepCounter) {
+                for (int j = 0; j < 10; j++) {
+                    double meanDistance = randomWalkMulti(k, 60);
+                    fileWriter.write(k + "," + meanDistance + "\n");
+                    System.out.println(k + "," + meanDistance);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
