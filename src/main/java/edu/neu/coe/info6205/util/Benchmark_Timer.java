@@ -4,6 +4,11 @@
 
 package edu.neu.coe.info6205.util;
 
+import edu.neu.coe.info6205.sort.elementary.InsertionSort;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -125,4 +130,113 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
     private final Consumer<T> fPost;
 
     final static LazyLogger logger = new LazyLogger(Benchmark_Timer.class);
+
+    public static void main(String[] args) {
+        Random random = new Random();
+        InsertionSort<Integer> insertionSort = new InsertionSort<>();
+        Benchmark_Timer<Integer[]> benchTimer = new Benchmark_Timer<>("Benchmark_Timer Test", null, (x) -> insertionSort.sort(x, 0, x.length), null);
+
+        System.out.println("*****************************************************************************************************************************************************");
+
+        //Ordered Array creation
+        for(int i = 50; i < 30000; i = i*2) {
+
+            int j = i;
+
+            Supplier<Integer[]> supplier1 = () -> {
+                Integer[] intArray = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    intArray[k] = random.nextInt(j*100);
+                }
+
+                Arrays.sort(intArray);
+                return intArray;
+            };
+
+            // Running Insertion Sort 20 times now
+            double time = benchTimer.runFromSupplier(supplier1, 20);
+
+            System.out.println("Order Type : Sequential \n N-Value : " + i  + " and Time of execution : " + time);
+
+        }
+
+        System.out.println("*****************************************************************************************************************************************************");
+
+        //Randomized-ordered Array creation
+        for(int i = 50; i < 30000; i = i*2) {
+
+            int j = i;
+
+            Supplier<Integer[]> supplier2 = () -> {
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j);
+                }
+                return arr;
+            };
+
+            // Running Insertion Sort 20 times now
+            double time = benchTimer.runFromSupplier(supplier2, 20);
+
+            System.out.println("Order Type : Random \n N-Value : " + i  + " and Time of execution : " + time);
+        }
+
+
+        System.out.println("*****************************************************************************************************************************************************");
+
+        //Partially-ordered Array creation
+        for(int i = 50; i < 30000; i = i*2) {
+            int j = i;
+
+            Supplier<Integer[]> supplier3 = () -> {
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j*100);
+                }
+
+                Arrays.sort(arr);
+                int rearrange = (int) (0.5*j);
+
+                for(int i1 = 0; i1 < rearrange; i1++) {
+                    int index = random.nextInt(j);
+                    arr[index] = random.nextInt(j*100);
+                }
+
+                return arr;
+            };
+
+            // Running Insertion Sort 20 times now
+            double time = benchTimer.runFromSupplier(supplier3, 20);
+
+            System.out.println("Order Type : Partially Sequential \n N-Value : " + i  + " and Time of execution : " + time);
+
+        }
+
+        System.out.println("*****************************************************************************************************************************************************");
+
+        //Create a reverse ordered array and run benchmark test
+        for(int i = 50; i < 30000; i = i*2) {
+            int j = i;
+
+            Supplier<Integer[]> supplier4 = () -> {
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j);
+                }
+
+                Arrays.sort(arr, Collections.reverseOrder());
+                return arr;
+            };
+
+            // Running Insertion Sort 20 times now
+            double time = benchTimer.runFromSupplier(supplier4, 20);
+
+            System.out.println("Order Type : Reversed \n N-Value : " + i  + " and Time of execution : " + time);
+        }
+
+    }
 }
